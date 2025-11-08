@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32 LED Controller</title>
-    <!-- Link to the manifest file -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f0f2f5">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -21,18 +21,21 @@
             margin: 0;
             text-align: center;
         }
+
         .container {
             background: white;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             width: 80%;
             max-width: 400px;
         }
+
         h1 {
             color: #333;
             margin-bottom: 20px;
         }
+
         #status {
             margin-bottom: 20px;
             padding: 10px;
@@ -41,10 +44,12 @@
             color: #666;
             background-color: #eee;
         }
+
         .connected {
             background-color: #d4edda !important;
             color: #155724 !important;
         }
+
         button {
             width: 100%;
             padding: 15px;
@@ -56,26 +61,32 @@
             cursor: pointer;
             transition: opacity 0.2s;
         }
+
         button:active {
             opacity: 0.8;
         }
+
         button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
             opacity: 0.5;
         }
+
         #connectBtn {
             background-color: #007bff;
             color: white;
         }
+
         #onBtn {
             background-color: #28a745;
             color: white;
         }
+
         #offBtn {
             background-color: #dc3545;
             color: white;
         }
+
         #log {
             margin-top: 20px;
             font-size: 12px;
@@ -86,6 +97,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -97,18 +109,22 @@
             <button id="onBtn">TURN ON</button>
             <button id="offBtn">TURN OFF</button>
         </div>
-        
+
         <div id="log"></div>
     </div>
 
     <script>
-        // --- PWA Service Worker Registration ---
         if ('serviceWorker' in navigator) {
+            // 2. Wait until the page is fully loaded
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
+                // 3. Register the sw.js file
+                navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    }, err => {
+                        // Registration was successful
+                        console.log('ServiceWorker registration successful!');
+                    })
+                    .catch(err => {
+                        // Registration failed
                         console.log('ServiceWorker registration failed: ', err);
                     });
             });
@@ -150,7 +166,7 @@
                 log("Requesting Bluetooth Device...");
                 device = await navigator.bluetooth.requestDevice({
                     filters: [{ services: [SERVICE_UUID] }],
-                    optionalServices: [SERVICE_UUID] 
+                    optionalServices: [SERVICE_UUID]
                 });
 
                 device.addEventListener('gattserverdisconnected', onDisconnected);
@@ -200,8 +216,9 @@
             updateStatus("Web Bluetooth NOT supported in this browser.", false);
             connectBtn.disabled = true;
             // Don't use alert(), just log it.
-            log("Web Bluetooth not supported."); 
+            log("Web Bluetooth not supported.");
         }
     </script>
 </body>
+
 </html>
