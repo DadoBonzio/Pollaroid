@@ -8,7 +8,7 @@
   "description": "A description of your application.",
   "icons": [
     {
-      "src": "/icons/icon_192.png",
+      "src": "https://github.com/DadoBonzio/Pollaroid/blob/bafa2d5b91605142e43ec694a2a173f4a0d0d76c/icons/icon_192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
