@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 LED Controller</title>
+    <!-- Link to the manifest file -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f0f2f5">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        /* ... existing styles ... */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 80%;
+            max-width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #status {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #666;
+            background-color: #eee;
+        }
+        .connected {
+            background-color: #d4edda !important;
+            color: #155724 !important;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:active {
+            opacity: 0.8;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        #connectBtn {
+            background-color: #007bff;
+            color: white;
+        }
+        #onBtn {
+            background-color: #28a745;
+            color: white;
+        }
+        #offBtn {
+            background-color: #dc3545;
+            color: white;
+        }
+        #log {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+            max-height: 100px;
+            overflow-y: auto;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>LED Controller</h1>
+        <div id="status">Status: Disconnected</div>
+
+        <button id="connectBtn">Scan & Connect</button>
+        <div id="controlButtons" style="display: none;">
+            <button id="onBtn">TURN ON</button>
+            <button id="offBtn">TURN OFF</button>
+        </div>
+        
+        <div id="log"></div>
+    </div>
+
+    <script>
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // --- Existing BLE Code ---
+        const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+        const CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+
+        let device, server, service, characteristic;
+        const statusDiv = document.getElementById('status');
+        const logDiv = document.getElementById('log');
+        const connectBtn = document.getElementById('connectBtn');
+        const controlDiv = document.getElementById('controlButtons');
+        const onBtn = document.getElementById('onBtn');
+        const offBtn = document.getElementById('offBtn');
+
+        function log(message) {
+            console.log(message);
+            logDiv.innerHTML += message + "<br>";
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStatus(message, isConnected) {
+            statusDiv.textContent = "Status: " + message;
+            if (isConnected) {
+                statusDiv.classList.add('connected');
+                connectBtn.style.display = 'none';
+                controlDiv.style.display = 'block';
+            } else {
+                statusDiv.classList.remove('connected');
+                connectBtn.style.display = 'block';
+                controlDiv.style.display = 'none';
+            }
+        }
+
+        async function connect() {
+            try {
+                log("Requesting Bluetooth Device...");
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: [SERVICE_UUID] }],
+                    optionalServices: [SERVICE_UUID] 
+                });
+
+                device.addEventListener('gattserverdisconnected', onDisconnected);
+
+                log("Connecting to GATT Server...");
+                server = await device.gatt.connect();
+
+                log("Getting Service...");
+                service = await server.getPrimaryService(SERVICE_UUID);
+
+                log("Getting Characteristic...");
+                characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+
+                log("Connected!");
+                updateStatus("Connected", true);
+
+            } catch (error) {
+                log("Error: " + error);
+                updateStatus("Error (see log)", false);
+            }
+        }
+
+        function onDisconnected(event) {
+            log("Device disconnected");
+            updateStatus("Disconnected", false);
+        }
+
+        async function sendCommand(cmd) {
+            if (!characteristic) {
+                log("Error: Not connected");
+                return;
+            }
+            try {
+                let encoder = new TextEncoder('utf-8');
+                await characteristic.writeValue(encoder.encode(cmd));
+                log("Sent command: " + cmd);
+            } catch (error) {
+                log("Send Error: " + error);
+            }
+        }
+
+        connectBtn.addEventListener('click', connect);
+        onBtn.addEventListener('click', () => sendCommand('on'));
+        offBtn.addEventListener('click', () => sendCommand('off'));
+
+        if (!navigator.bluetooth) {
+            updateStatus("Web Bluetooth NOT supported in this browser.", false);
+            connectBtn.disabled = true;
+            // Don't use alert(), just log it.
+            log("Web Bluetooth not supported."); 
+        }
+    </script>
+</body>
+</html>
