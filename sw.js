@@ -1,11 +1,10 @@
 const CACHE_NAME = 'my-pwa-cache-v1';
 // Add the URLs of all the files you want to cache
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/icons/icon_192.png',  // <-- Make sure this path is correct
-    '/icons/icon_512.png'
+    'index.html',
+    'manifest.json',
+    'icons/icon_192.png',
+    'icons/icon_512.png'
 ];
 
 // 1. Install the service worker and cache files
