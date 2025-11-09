@@ -119,7 +119,7 @@
             // 2. Wait until the page is fully loaded
             window.addEventListener('load', () => {
                 // 3. Register the sw.js file
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('sw.js')
                     .then(registration => {
                         // Registration was successful
                         console.log('ServiceWorker registration successful!');
