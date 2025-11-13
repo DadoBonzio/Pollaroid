@@ -19,5 +19,26 @@
       "type": "image/png",
       "purpose": "maskable any"
     }
-  ]
+  ],
+  "widgets": {
+    "name": "super cool widget",
+    "description": "just an epic widget",
+    "tag": "42",
+    "url": "widgets/widget_01.html",
+    "icons": [
+      {
+        "src": "icons/icon_192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable any"
+      },
+      {
+        "src": "icons/icon_512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable any"
+      }
+    ],
+    "screenshots": []
+  }
 }
