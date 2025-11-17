@@ -102,18 +102,18 @@
 <body>
 
     <div class="container">
-        <h1>LED Controller</h1>
-        <div id="status">Status: Disconnected</div>
+        <div>
+            <h1>LED Controller</h1>
+            <div id="status">Status: Disconnected</div>
 
-        <button id="connectBtn">Scan & Connect</button>
-        <div id="controlButtons" style="display: none;">
-            <button id="onBtn">TURN ON</button>
-            <button id="offBtn">TURN OFF</button>
+            <button id="connectBtn">Scan & Connect</button>
+            <div id="controlButtons" style="display: none;">
+                <button id="onBtn">TURN ON</button>
+                <button id="offBtn">TURN OFF</button>
+            </div>
+            <div id="log"></div>
         </div>
-
-        <div id="log"></div>
     </div>
-
     <script>
         if ('serviceWorker' in navigator) {
             // 2. Wait until the page is fully loaded

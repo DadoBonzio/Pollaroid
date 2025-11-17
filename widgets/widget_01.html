@@ -102,122 +102,23 @@
 <body>
 
     <div class="container">
-        <h1>LED Controller</h1>
-        <div id="status">Status: Disconnected</div>
-
-        <button id="connectBtn">Scan & Connect</button>
-        <div id="controlButtons" style="display: none;">
-            <button id="onBtn">TURN ON</button>
-            <button id="offBtn">TURN OFF</button>
-        </div>
-
-        <div id="log"></div>
+       <h1>The coolest widget the world has ever seen</h1>
+       <h2>aura counter: 0</h2> 
+       <button onclick="glory()">press for the glory</button>
+       <button onclick="loseAura()">I prefer seals over ducks</button>
+ 
+       <div id="log"></div>
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            // 2. Wait until the page is fully loaded
-            window.addEventListener('load', () => {
-                // 3. Register the sw.js file
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        // Registration was successful
-                        console.log('ServiceWorker registration successful!');
-                    })
-                    .catch(err => {
-                        // Registration failed
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
+        aura = 0;
+        function glory(){
+            aura += 1;
+            document.querySelector('h2').innerText = `aura counter: ${aura}`;
         }
-
-        // --- Existing BLE Code ---
-        const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
-        const CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-
-        let device, server, service, characteristic;
-        const statusDiv = document.getElementById('status');
-        const logDiv = document.getElementById('log');
-        const connectBtn = document.getElementById('connectBtn');
-        const controlDiv = document.getElementById('controlButtons');
-        const onBtn = document.getElementById('onBtn');
-        const offBtn = document.getElementById('offBtn');
-
-        function log(message) {
-            console.log(message);
-            logDiv.innerHTML += message + "<br>";
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }
-
-        function updateStatus(message, isConnected) {
-            statusDiv.textContent = "Status: " + message;
-            if (isConnected) {
-                statusDiv.classList.add('connected');
-                connectBtn.style.display = 'none';
-                controlDiv.style.display = 'block';
-            } else {
-                statusDiv.classList.remove('connected');
-                connectBtn.style.display = 'block';
-                controlDiv.style.display = 'none';
-            }
-        }
-
-        async function connect() {
-            try {
-                log("Requesting Bluetooth Device...");
-                device = await navigator.bluetooth.requestDevice({
-                    filters: [{ services: [SERVICE_UUID] }],
-                    optionalServices: [SERVICE_UUID]
-                });
-
-                device.addEventListener('gattserverdisconnected', onDisconnected);
-
-                log("Connecting to GATT Server...");
-                server = await device.gatt.connect();
-
-                log("Getting Service...");
-                service = await server.getPrimaryService(SERVICE_UUID);
-
-                log("Getting Characteristic...");
-                characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
-
-                log("Connected!");
-                updateStatus("Connected", true);
-
-            } catch (error) {
-                log("Error: " + error);
-                updateStatus("Error (see log)", false);
-            }
-        }
-
-        function onDisconnected(event) {
-            log("Device disconnected");
-            updateStatus("Disconnected", false);
-        }
-
-        async function sendCommand(cmd) {
-            if (!characteristic) {
-                log("Error: Not connected");
-                return;
-            }
-            try {
-                let encoder = new TextEncoder('utf-8');
-                await characteristic.writeValue(encoder.encode(cmd));
-                log("Sent command: " + cmd);
-            } catch (error) {
-                log("Send Error: " + error);
-            }
-        }
-
-        connectBtn.addEventListener('click', connect);
-        onBtn.addEventListener('click', () => sendCommand('on'));
-        offBtn.addEventListener('click', () => sendCommand('off'));
-
-        if (!navigator.bluetooth) {
-            updateStatus("Web Bluetooth NOT supported in this browser.", false);
-            connectBtn.disabled = true;
-            // Don't use alert(), just log it.
-            log("Web Bluetooth not supported.");
+        function loseAura(){
+            aura = 0
+            document.querySelector('h2').innerText = `aura counter: ${aura}`;
         }
     </script>
 </body>
